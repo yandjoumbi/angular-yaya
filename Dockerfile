@@ -16,8 +16,8 @@ RUN npm install
 # Copy the rest of the application code into the container
 COPY . .
 
-# Build the Angular app
-RUN ng build --prod
+# Build the Angular app  
+RUN ng build
 
 # Use an official Nginx image as a parent image
 FROM nginx:alpine
