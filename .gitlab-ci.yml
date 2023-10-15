@@ -1,0 +1,32 @@
+stages:
+  - build
+  - package
+  - deploy
+
+variables:
+  # Define environment-specific variables
+  AWS_DEFAULT_REGION: "us-west-2"
+  AWS_ACCESS_KEY_ID: "AKIAYWJUS24ZF544OJNX"
+  AWS_SECRET_ACCESS_KEY: "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"
+  AWS_ACCOUNT_ID: "597647611698"
+  ECR_REGISTRY: "v6n8a7u8.dkr.ecr.us-west-2.amazonaws.com"
+  ECR_REPOSITORY: "angular"
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+
+package:
+  stage: package
+  script:
+    - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+    - docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$CI_COMMIT_SHORT_SHA .
+    - docker push $ECR_REGISTRY/$ECR_REPOSITORY:$CI_COMMIT_SHORT_SHA
+
+deploy:
+  stage: deploy
+  script:
+    - aws ecr create-repository --repository-name $ECR_REPOSITORY
+    - aws ecr set-repository-policy --repository-name $ECR_REPOSITORY --policy-text '{"Version": "2008-10-17","Statement": [{"Sid": "AllowPushPull","Effect": "Allow","Principal": "*","Action": ["ecr:GetDownloadUrlForLayer","ecr:BatchCheckLayerAvailability","ecr:GetDownloadUrlForLayer","ecr:GetRepositoryPolicy","ecr:ListImages","ecr:DescribeImages","ecr:BatchGetImage","ecr:GetAuthorizationToken"]}]}' --force
