@@ -1,5 +1,10 @@
+
+
 # Use an official Node.js runtime as a parent image
-FROM node:14 as build
+FROM node:18 as build
+
+# person who created and maitain this docker image
+LABEL maintainer="Yannick Djoumbi <ydjoumbi@gmail.com>"
 
 # Set the working directory in the container
 WORKDIR /app
